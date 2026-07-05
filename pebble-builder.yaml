@@ -1,0 +1,71 @@
+# Pebble Builder VM — Lima YAML
+# Creates an x86_64 VM with Pebble SDK + Moddable/Alloy tooling
+#
+# Usage:
+#   corral create pebble-builder --file pebble-builder.yaml --kubevirt
+#   corral start pebble-builder
+#   corral ssh pebble-builder
+#   # Then inside:
+#   pebble build                          # build PebHub
+#   pebble install --phone 192.168.0.11   # install on your watch
+
+images:
+- location: "https://cloud.debian.org/images/cloud/bookworm/20241004-1971/debian-12-genericcloud-amd64.qcow2"
+  arch: "x86_64"
+
+cpus: 4
+memory: "8GiB"
+disk: "80GiB"
+
+mounts: []
+
+ssh:
+  localPort: 0
+  forward:
+  - guestPort: 22
+    localIP: "127.0.0.1"
+
+provision:
+- mode: system
+  script: |
+    #!/bin/bash
+    set -eux
+
+    # Basic tools
+    apt-get update -qq
+    apt-get install -y -qq curl git ca-certificates
+
+    # Node.js 20.x (for pebble SDK npm deps)
+    curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+    apt-get install -y -qq nodejs
+
+- mode: user
+  script: |
+    #!/bin/bash
+    set -eux
+
+    # Install uv + pebble-tool
+    curl -fsSL https://astral.sh/uv/install.sh | sh
+    export PATH="$HOME/.local/bin:$PATH"
+    uv tool install pebble-tool --python 3.12
+
+    # Create SDK directory on a larger mount if available
+    if mountpoint -q /mnt/pebble-sdk 2>/dev/null; then
+      mkdir -p /mnt/pebble-sdk/pebble-sdk
+      mkdir -p ~/.local/share
+      ln -sf /mnt/pebble-sdk/pebble-sdk ~/.local/share/pebble-sdk
+    fi
+
+    # Install Pebble SDK
+    pebble sdk install latest
+
+    # Clone PebHub
+    git clone https://github.com/hanthor/PebHub ~/PebHub
+    cd ~/PebHub
+    git checkout alloy-migration
+
+    echo ""
+    echo "=== Pebble Builder VM ready ==="
+    echo "Build:   cd ~/PebHub && pebble build"
+    echo "Install: cd ~/PebHub && pebble install --phone <WATCH_IP>"
+    echo ""
