@@ -1,0 +1,7 @@
+build
+.lock-waf_*
+**/package-lock.json
+**/node_modules/**
+.DS_Store
+*.swp
+*.swo

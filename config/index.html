@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+  <title>PebHub Config</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #0d1117;
+      color: #c9d1d9;
+      padding: 16px;
+      max-width: 480px;
+      margin: 0 auto;
+      font-size: 15px;
+      line-height: 1.5;
+    }
+    h1 {
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 4px;
+      color: #f0f6fc;
+    }
+    h2 {
+      font-size: 16px;
+      font-weight: 600;
+      margin: 20px 0 8px;
+      color: #f0f6fc;
+      border-bottom: 1px solid #30363d;
+      padding-bottom: 6px;
+    }
+    .subtitle {
+      color: #8b949e;
+      font-size: 13px;
+      margin-bottom: 16px;
+    }
+    label {
+      display: block;
+      margin: 12px 0 4px;
+      font-weight: 500;
+      font-size: 14px;
+      color: #c9d1d9;
+    }
+    .hint {
+      color: #8b949e;
+      font-size: 12px;
+      margin: 2px 0 6px;
+    }
+    input[type="text"],
+    input[type="password"],
+    input[type="number"],
+    select {
+      width: 100%;
+      padding: 10px 12px;
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 8px;
+      color: #c9d1d9;
+      font-size: 15px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    input:focus, select:focus {
+      border-color: #58a6ff;
+    }
+    select {
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238b949e' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+      padding-right: 28px;
+    }
+    .toggle-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 8px 0;
+    }
+    .toggle-btn {
+      padding: 8px 14px;
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 20px;
+      color: #8b949e;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s;
+      user-select: none;
+    }
+    .toggle-btn.active {
+      background: #1f6feb22;
+      border-color: #1f6feb;
+      color: #58a6ff;
+    }
+    button.primary {
+      width: 100%;
+      padding: 14px;
+      background: #238636;
+      border: none;
+      border-radius: 8px;
+      color: #fff;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      margin: 20px 0 8px;
+      transition: background 0.2s;
+    }
+    button.primary:active {
+      background: #2ea043;
+    }
+    button.primary:disabled {
+      background: #21262d;
+      color: #484f58;
+    }
+    .oauth-section {
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 8px;
+      padding: 14px;
+      margin: 12px 0;
+      text-align: center;
+    }
+    .oauth-section .code {
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: 6px;
+      color: #58a6ff;
+      margin: 10px 0;
+      font-family: monospace;
+    }
+    .hr {
+      border: none;
+      border-top: 1px solid #30363d;
+      margin: 16px 0;
+    }
+    .cinders-note {
+      background: #161b22;
+      border-left: 3px solid #f0883e;
+      padding: 10px 12px;
+      border-radius: 0 8px 8px 0;
+      font-size: 12px;
+      color: #8b949e;
+      margin: 8px 0;
+    }
+  </style>
+</head>
+<body>
+
+<h1>PebHub</h1>
+<p class="subtitle">Unofficial GitHub Client for Pebble</p>
+
+<!-- Forge selection -->
+<h2>Account</h2>
+
+<div class="cinders-note">
+  ⚡ Config schema is compatible with <b>Cinders</b> (<code>dev.yulian.Cinders</code>).
+  Same field names: forge, url, auth-method, excluded-repositories.
+  Import from Cinders' Flatpak settings by copying values below.
+</div>
+
+<label for="forge">Git Forge</label>
+<select id="forge">
+  <option value="github">GitHub</option>
+  <option value="gitlab">GitLab</option>
+  <option value="gitea">Gitea</option>
+  <option value="forgejo">Forgejo</option>
+</select>
+
+<label for="url">Instance URL</label>
+<input type="text" id="url" value="github.com" placeholder="github.com">
+
+<label for="authMethod">Auth Method</label>
+<select id="authMethod">
+  <option value="token">Personal Access Token</option>
+  <option value="oauth">OAuth Device Flow</option>
+</select>
+
+<div id="tokenSection">
+  <label for="token">Access Token</label>
+  <input type="password" id="token" placeholder="ghp_... or ghs_..." autocomplete="off">
+  <div class="hint">
+    Requires a classic PAT with <b>notifications</b> and <b>read:user</b> scopes.
+    Add <b>repo</b> scope for private repos.
+    <a href="https://github.com/settings/tokens" target="_blank" style="color:#58a6ff;">Create token →</a>
+  </div>
+</div>
+
+<div id="oauthSection" style="display:none;">
+  <div class="oauth-section">
+    <p>Start OAuth Device Flow from the Pebble watch.</p>
+    <p style="font-size:12px;color:#8b949e;margin-top:6px;">
+      Press the SELECT button on the PebHub watch screen
+      and follow the on-screen instructions.
+    </p>
+  </div>
+</div>
+
+<!-- Notification types -->
+<h2>Notification Feed</h2>
+<label>Notification Types to Show</label>
+<div class="hint">Only these GitHub notification types will appear in your feed.</div>
+<div class="toggle-group" id="notifTypes">
+  <span class="toggle-btn active" data-value="Issue">Issues</span>
+  <span class="toggle-btn active" data-value="PullRequest">Pull Requests</span>
+  <span class="toggle-btn active" data-value="CheckSuite">CI Checks</span>
+  <span class="toggle-btn" data-value="Discussion">Discussions</span>
+  <span class="toggle-btn" data-value="Release">Releases</span>
+  <span class="toggle-btn" data-value="Commit">Commits</span>
+  <span class="toggle-btn" data-value="RepositoryInvitation">Invitations</span>
+  <span class="toggle-btn" data-value="RepositoryVulnerabilityAlert">Vulnerabilities</span>
+  <span class="toggle-btn" data-value="RepositoryDependabotAlertsThread">Dependabot</span>
+</div>
+
+<!-- Excluded repos -->
+<h2>Repository Filters</h2>
+<label for="excludedRepos">Excluded Repositories</label>
+<input type="text" id="excludedRepos" placeholder="owner/repo, another-org">
+<div class="hint">
+  Comma-separated. Supports repo names (<code>owner/repo</code>),
+  owner-only (<code>org-name</code>), and regex (<code>/pattern/i</code>).
+  Same format as Cinders.
+</div>
+
+<!-- CI Dashboard -->
+<h2>CI Dashboard</h2>
+<label for="pollInterval">Poll Interval (seconds)</label>
+<input type="number" id="pollInterval" value="300" min="60" max="3600">
+<div class="hint">How often to check for new notifications and CI runs. Minimum 60s.</div>
+
+<label for="maxNotifications">Max Notifications</label>
+<input type="number" id="maxNotifications" value="50" min="10" max="100">
+
+<label for="maxCiRuns">Max CI Runs</label>
+<input type="number" id="maxCiRuns" value="10" min="3" max="50">
+
+<hr class="hr">
+
+<button class="primary" id="saveBtn">Save & Close</button>
+
+<script>
+(function () {
+  // Parse query params (initial values from pkjs)
+  const params = new URLSearchParams(window.location.search);
+
+  // ── Cinders-compatible schema ──────────────────────────────────────
+  function getConfig() {
+    const forge = document.getElementById("forge").value;
+    const url = document.getElementById("url").value;
+    const authMethod = document.getElementById("authMethod").value;
+    const token = document.getElementById("token").value;
+
+    // Gather active notification types
+    const notifTypes = [];
+    document.querySelectorAll("#notifTypes .toggle-btn.active").forEach(function (btn) {
+      notifTypes.push(btn.dataset.value);
+    });
+
+    // Parse excluded repos (comma-separated, same as Cinders)
+    const excludedRepos = document.getElementById("excludedRepos").value
+      .split(",")
+      .map(function (s) { return s.trim(); })
+      .filter(function (s) { return s.length > 0; });
+
+    const config = {
+      forge: forge,
+      url: url,
+      authMethod: authMethod,
+      token: token,
+      excludedRepos: excludedRepos,
+      notifTypes: notifTypes,
+      pollInterval: parseInt(document.getElementById("pollInterval").value, 10) || 300,
+      maxNotifications: parseInt(document.getElementById("maxNotifications").value, 10) || 50,
+      maxCiRuns: parseInt(document.getElementById("maxCiRuns").value, 10) || 10
+    };
+
+    return config;
+  }
+
+  // ── Toggle buttons for notification types ──────────────────────────
+  document.querySelectorAll("#notifTypes .toggle-btn").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      this.classList.toggle("active");
+    });
+  });
+
+  // ── Auth method toggle ─────────────────────────────────────────────
+  function toggleAuthMethod() {
+    const method = document.getElementById("authMethod").value;
+    document.getElementById("tokenSection").style.display = method === "token" ? "block" : "none";
+    document.getElementById("oauthSection").style.display = method === "oauth" ? "block" : "none";
+  }
+  document.getElementById("authMethod").addEventListener("change", toggleAuthMethod);
+
+  // ── Save ────────────────────────────────────────────────────────────
+  document.getElementById("saveBtn").addEventListener("click", function () {
+    var config = getConfig();
+
+    // Validate
+    if (config.authMethod === "token" && !config.token) {
+      alert("Please enter a GitHub personal access token.");
+      return;
+    }
+
+    // Send back to Pebble app
+    var location = document.location;
+    location.href = "pebblejs://close#" + encodeURIComponent(JSON.stringify(config));
+  });
+
+  // ── Pre-fill from params (Cinders-compatible fields) ────────────────
+  if (params.has("forge")) document.getElementById("forge").value = params.get("forge");
+  if (params.has("url")) document.getElementById("url").value = params.get("url");
+  if (params.has("authMethod")) {
+    document.getElementById("authMethod").value = params.get("authMethod");
+    toggleAuthMethod();
+  }
+  if (params.has("excludedRepos")) {
+    try {
+      var repos = JSON.parse(params.get("excludedRepos"));
+      if (Array.isArray(repos)) document.getElementById("excludedRepos").value = repos.join(", ");
+    } catch (e) {}
+  }
+  if (params.has("notifTypes")) {
+    try {
+      var types = JSON.parse(params.get("notifTypes"));
+      if (Array.isArray(types)) {
+        document.querySelectorAll("#notifTypes .toggle-btn").forEach(function (btn) {
+          btn.classList.toggle("active", types.indexOf(btn.dataset.value) !== -1);
+        });
+      }
+    } catch (e) {}
+  }
+  if (params.has("pollInterval")) document.getElementById("pollInterval").value = params.get("pollInterval");
+  if (params.has("maxNotifications")) document.getElementById("maxNotifications").value = params.get("maxNotifications");
+  if (params.has("maxCiRuns")) document.getElementById("maxCiRuns").value = params.get("maxCiRuns");
+  if (params.has("username")) {
+    // Pre-fill username is informational only, not editable
+  }
+
+  toggleAuthMethod();
+})();
+</script>
+</body>
+</html>
