@@ -13,7 +13,7 @@
     "projectType": "moddable",
     "sdkVersion": "3",
     "enableMultiJS": true,
-    "targetPlatforms": ["emery", "gabbro"],
+    "targetPlatforms": ["emery", "gabbro", "diorite", "basalt", "chalk", "flint"],
     "watchapp": {
       "watchface": false
     },
