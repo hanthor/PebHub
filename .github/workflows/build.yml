@@ -1,0 +1,66 @@
+name: Build
+
+on:
+  push:
+    branches: [main, alloy-migration]
+  pull_request:
+    branches: [main]
+  release:
+    types: [published]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: Install Pebble tool + SDK
+        run: |
+          uv tool install pebble-tool --python 3.12
+          export PATH="$HOME/.local/bin:$PATH"
+          pebble sdk install latest
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Clone Moddable SDK
+        run: |
+          git clone --depth 1 https://github.com/Moddable-OpenSource/moddable /tmp/moddable
+          export MODDABLE=/tmp/moddable
+          cd $MODDABLE/xs/makefiles/lin && make
+
+      - name: Build tools
+        run: |
+          export MODDABLE=/tmp/moddable
+          export TMPDIR=/tmp
+          export PATH="$MODDABLE/build/bin/lin/release:$HOME/.local/bin:$PATH"
+          cd $MODDABLE/build/makefiles/lin && make
+
+      - name: Build PebHub
+        run: |
+          export MODDABLE=/tmp/moddable
+          export TMPDIR=/tmp
+          export MODDABLE_BUILD="$MODDABLE/build/bin/lin/release"
+          export PATH="$MODDABLE_BUILD:$HOME/.local/bin:$PATH"
+          cd $GITHUB_WORKSPACE
+          pebble build
+
+      - name: Upload PBW artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: PebHub-pbw
+          path: build/PebHub.pbw
+          retention-days: 30
+
+      - name: Upload to Release
+        if: github.event_name == 'release'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release upload ${{ github.event.release.tag_name }} build/PebHub.pbw --clobber
