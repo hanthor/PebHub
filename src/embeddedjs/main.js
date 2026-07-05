@@ -329,53 +329,55 @@ async function poll() {
 }
 
 // ── Rendering ──────────────────────────────────────────────────────
-let render = new Poco(screen);
+let gfx = new Poco(screen);
 
 const LINE_H = 18;
 const ITEM_H = 36;
 const HEADER_H = 30;
 const MARGIN = 4;
-const SMALL = new render.Font("Bitham-Black", 16);
-const LARGE = new render.Font("Bitham-Black", 20);
-const TINY = new render.Font("Bitham-Black", 13);
+const SMALL = new gfx.Font("Bitham-Black", 16);
+const LARGE = new gfx.Font("Bitham-Black", 20);
+const TINY = new gfx.Font("Bitham-Black", 13);
 
 // Icons (drawn as simple shapes since we don't have image textures for these)
 function drawIcon(x, y, type, state_) {
+	const g = gfx;
 	const r = 5;
 	const cx = x + 10;
 	const cy = y + ITEM_H / 2;
 
 	switch (type) {
 		case "Issue":
-			render.fillRectangle(COLORS.green, cx - r, cy - r, r * 2, r * 2);
-			if (state_ === "closed") render.fillRectangle(COLORS.dim, cx - r, cy - r, r * 2, r * 2);
+			gfx.fillRectangle(COLORS.green, cx - r, cy - r, r * 2, r * 2);
+			if (state_ === "closed") gfx.fillRectangle(COLORS.dim, cx - r, cy - r, r * 2, r * 2);
 			break;
 		case "PullRequest":
 			if (state_ === "merged") {
 				// Purple-ish for merged
-				render.fillRectangle(rgb(130, 80, 200), cx - r, cy - r, 3, r * 2);
-				render.fillRectangle(rgb(130, 80, 200), cx - 2, cy, r * 2, 3);
+				gfx.fillRectangle(rgb(130, 80, 200), cx - r, cy - r, 3, r * 2);
+				gfx.fillRectangle(rgb(130, 80, 200), cx - 2, cy, r * 2, 3);
 			} else if (state_ === "denied" || state_ === "closed") {
-				render.fillRectangle(COLORS.red, cx - r, cy - r, r * 2, r * 2);
+				gfx.fillRectangle(COLORS.red, cx - r, cy - r, r * 2, r * 2);
 			} else if (state_ === "draft") {
-				render.fillRectangle(COLORS.dim, cx - r, cy - r, r * 2, r * 2);
+				gfx.fillRectangle(COLORS.dim, cx - r, cy - r, r * 2, r * 2);
 			} else {
-				render.fillRectangle(COLORS.accent, cx - r, cy - r, r * 2, r * 2);
+				gfx.fillRectangle(COLORS.accent, cx - r, cy - r, r * 2, r * 2);
 			}
 			break;
 		case "CheckSuite":
 			if (state_ === "failure" || state_ === "cancelled") {
-				render.fillRectangle(COLORS.red, cx - r, cy - r, r * 2, r * 2);
+				gfx.fillRectangle(COLORS.red, cx - r, cy - r, r * 2, r * 2);
 			} else {
-				render.fillRectangle(COLORS.green, cx - r, cy - r, r * 2, r * 2);
+				gfx.fillRectangle(COLORS.green, cx - r, cy - r, r * 2, r * 2);
 			}
 			break;
 		default:
-			render.fillRectangle(COLORS.dim, cx - r, cy - r, r * 2, r * 2);
+			gfx.fillRectangle(COLORS.dim, cx - r, cy - r, r * 2, r * 2);
 	}
 }
 
 function drawCiIcon(x, y, conclusion, status) {
+	const g = gfx;
 	const cx = x + 10;
 	const cy = y + ITEM_H / 2;
 	const r = 5;
@@ -387,7 +389,7 @@ function drawCiIcon(x, y, conclusion, status) {
 	else if (status === "in_progress" || status === "queued" || status === "pending") color = COLORS.yellow;
 	else color = COLORS.dim;
 
-	render.fillRectangle(color, cx - r, cy - r, r * 2, r * 2);
+	gfx.fillRectangle(color, cx - r, cy - r, r * 2, r * 2);
 }
 
 function getCiStatusLabel(conclusion, status) {
@@ -411,24 +413,24 @@ function getCiStatusColor(conclusion, status) {
 
 // ── Screen rendering ──────────────────────────────────────────────
 function renderSplash(msg) {
-	render.begin();
-	render.fillRectangle(COLORS.background, 0, 0, WIDTH, HEIGHT);
+	gfx.begin();
+	gfx.fillRectangle(COLORS.background, 0, 0, WIDTH, HEIGHT);
 
-	const msgW = render.getTextWidth(msg, SMALL);
-	render.drawText(msg, SMALL, COLORS.dim,
+	const msgW = gfx.getTextWidth(msg, SMALL);
+	gfx.drawText(msg, SMALL, COLORS.dim,
 		(WIDTH - msgW) / 2, HEIGHT / 2 - 10);
 
-	render.end();
+	gfx.end();
 }
 
 function renderSetup() {
-	render.begin();
-	render.fillRectangle(COLORS.background, 0, 0, WIDTH, HEIGHT);
+	gfx.begin();
+	gfx.fillRectangle(COLORS.background, 0, 0, WIDTH, HEIGHT);
 
 	// Title
 	const title = "PebHub";
-	const tw = render.getTextWidth(title, LARGE);
-	render.drawText(title, LARGE, COLORS.text, (WIDTH - tw) / 2, 15);
+	const tw = gfx.getTextWidth(title, LARGE);
+	gfx.drawText(title, LARGE, COLORS.text, (WIDTH - tw) / 2, 15);
 
 	// Instructions
 	const lines = [
@@ -447,31 +449,31 @@ function renderSetup() {
 
 	let y = 60;
 	for (const line of lines) {
-		const lw = render.getTextWidth(line, TINY);
-		render.drawText(line, TINY, COLORS.dim, (WIDTH - lw) / 2, y);
+		const lw = gfx.getTextWidth(line, TINY);
+		gfx.drawText(line, TINY, COLORS.dim, (WIDTH - lw) / 2, y);
 		y += 16;
 	}
 
-	render.end();
+	gfx.end();
 }
 
 function renderFeed() {
-	render.begin();
-	render.fillRectangle(COLORS.background, 0, 0, WIDTH, HEIGHT);
+	gfx.begin();
+	gfx.fillRectangle(COLORS.background, 0, 0, WIDTH, HEIGHT);
 
 	// Header bar
-	render.fillRectangle(COLORS.headerBg, 0, 0, WIDTH, HEADER_H);
-	render.drawText("PebHub", SMALL, COLORS.text, 8, 6);
+	gfx.fillRectangle(COLORS.headerBg, 0, 0, WIDTH, HEADER_H);
+	gfx.drawText("PebHub", SMALL, COLORS.text, 8, 6);
 
 	// Notification count
 	const count = state.notifications.length;
 	const countStr = String(count);
-	const cw = render.getTextWidth(countStr, TINY);
+	const cw = gfx.getTextWidth(countStr, TINY);
 	const countColor = state.failedCiSinceLastPoll ? COLORS.red : COLORS.dim;
-	render.drawText(countStr, TINY, countColor, WIDTH - cw - 8, 8);
+	gfx.drawText(countStr, TINY, countColor, WIDTH - cw - 8, 8);
 
 	// Separator
-	render.fillRectangle(COLORS.border, 0, HEADER_H, WIDTH, 1);
+	gfx.fillRectangle(COLORS.border, 0, HEADER_H, WIDTH, 1);
 
 	// Notification items
 	const visibleLines = Math.floor((HEIGHT - HEADER_H) / ITEM_H);
@@ -483,7 +485,7 @@ function renderFeed() {
 
 		// Selection highlight
 		if ((startIdx + i) === state.selection) {
-			render.fillRectangle(COLORS.card, 0, y, WIDTH, ITEM_H);
+			gfx.fillRectangle(COLORS.card, 0, y, WIDTH, ITEM_H);
 		}
 
 		// Icon
@@ -491,55 +493,55 @@ function renderFeed() {
 
 		// Title (truncated)
 		const title = item.title.length > 24 ? item.title.slice(0, 22) + ".." : item.title;
-		render.drawText(title, TINY, COLORS.text, 22, y + 4);
+		gfx.drawText(title, TINY, COLORS.text, 22, y + 4);
 
 		// Subtitle: repo + relative time
 		const repo = item.repository.length > 18 ? "..." + item.repository.slice(-16) : item.repository;
-		render.drawText(repo, TINY, COLORS.dim, 22, y + 20);
+		gfx.drawText(repo, TINY, COLORS.dim, 22, y + 20);
 
 		// Unread indicator
 		if (item.unread) {
-			render.fillRectangle(COLORS.accent, WIDTH - 6, y + (ITEM_H / 2) - 2, 4, 4);
+			gfx.fillRectangle(COLORS.accent, WIDTH - 6, y + (ITEM_H / 2) - 2, 4, 4);
 		}
 
 		// Separator
 		if (i < visibleLines - 1) {
-			render.fillRectangle(COLORS.border, 20, y + ITEM_H - 1, WIDTH - 20, 1);
+			gfx.fillRectangle(COLORS.border, 20, y + ITEM_H - 1, WIDTH - 20, 1);
 		}
 	}
 
 	// Empty state
 	if (state.notifications.length === 0) {
 		const msg = "No notifications";
-		const mw = render.getTextWidth(msg, SMALL);
-		render.drawText(msg, SMALL, COLORS.dim, (WIDTH - mw) / 2, HEIGHT / 2 - 10);
+		const mw = gfx.getTextWidth(msg, SMALL);
+		gfx.drawText(msg, SMALL, COLORS.dim, (WIDTH - mw) / 2, HEIGHT / 2 - 10);
 	}
 
 	// Header hint
 	const hint = "Up/Down scroll  Select detail  Back:CI";
-	const hw = render.getTextWidth(hint, TINY);
-	render.drawText(hint, TINY, COLORS.dim, WIDTH - hw - 4, 8);
+	const hw = gfx.getTextWidth(hint, TINY);
+	gfx.drawText(hint, TINY, COLORS.dim, WIDTH - hw - 4, 8);
 
-	render.end();
+	gfx.end();
 }
 
 function renderCiDashboard() {
-	render.begin();
-	render.fillRectangle(COLORS.background, 0, 0, WIDTH, HEIGHT);
+	gfx.begin();
+	gfx.fillRectangle(COLORS.background, 0, 0, WIDTH, HEIGHT);
 
 	// Header bar
-	render.fillRectangle(COLORS.headerBg, 0, 0, WIDTH, HEADER_H);
-	render.drawText("CI Status", SMALL, COLORS.text, 8, 6);
+	gfx.fillRectangle(COLORS.headerBg, 0, 0, WIDTH, HEADER_H);
+	gfx.drawText("CI Status", SMALL, COLORS.text, 8, 6);
 
 	// Timestamp
 	if (state.lastCheck > 0) {
 		const ago = Math.round((Date.now() - state.lastCheck) / 60000) + "m ago";
-		const aw = render.getTextWidth(ago, TINY);
-		render.drawText(ago, TINY, COLORS.dim, WIDTH - aw - 8, 8);
+		const aw = gfx.getTextWidth(ago, TINY);
+		gfx.drawText(ago, TINY, COLORS.dim, WIDTH - aw - 8, 8);
 	}
 
 	// Separator
-	render.fillRectangle(COLORS.border, 0, HEADER_H, WIDTH, 1);
+	gfx.fillRectangle(COLORS.border, 0, HEADER_H, WIDTH, 1);
 
 	// CI items
 	const visibleLines = Math.floor((HEIGHT - HEADER_H) / ITEM_H);
@@ -551,7 +553,7 @@ function renderCiDashboard() {
 
 		// Selection highlight
 		if ((startIdx + i) === state.selection) {
-			render.fillRectangle(COLORS.card, 0, y, WIDTH, ITEM_H);
+			gfx.fillRectangle(COLORS.card, 0, y, WIDTH, ITEM_H);
 		}
 
 		// CI status icon
@@ -559,51 +561,51 @@ function renderCiDashboard() {
 
 		// Workflow name (truncated)
 		const name = run.workflow.length > 22 ? run.workflow.slice(0, 20) + ".." : run.workflow;
-		render.drawText(name, TINY, COLORS.text, 22, y + 2);
+		gfx.drawText(name, TINY, COLORS.text, 22, y + 2);
 
 		// Branch
 		const branch = run.branch ? (run.branch.length > 14 ? run.branch.slice(0, 12) + ".." : run.branch) : "";
-		render.drawText(branch, TINY, COLORS.dim, 22, y + 17);
+		gfx.drawText(branch, TINY, COLORS.dim, 22, y + 17);
 
 		// Status label
 		const statusLabel = getCiStatusLabel(run.conclusion, run.status);
 		const statusColor = getCiStatusColor(run.conclusion, run.status);
-		const sw = render.getTextWidth(statusLabel, TINY);
-		render.drawText(statusLabel, TINY, statusColor, WIDTH - sw - 6, y + 2);
+		const sw = gfx.getTextWidth(statusLabel, TINY);
+		gfx.drawText(statusLabel, TINY, statusColor, WIDTH - sw - 6, y + 2);
 
 		// Separator
 		if (i < visibleLines - 1) {
-			render.fillRectangle(COLORS.border, 20, y + ITEM_H - 1, WIDTH - 20, 1);
+			gfx.fillRectangle(COLORS.border, 20, y + ITEM_H - 1, WIDTH - 20, 1);
 		}
 	}
 
 	// Empty state
 	if (state.ciRuns.length === 0) {
 		const msg = "No CI runs found";
-		const mw = render.getTextWidth(msg, SMALL);
-		render.drawText(msg, SMALL, COLORS.dim, (WIDTH - mw) / 2, HEIGHT / 2 - 10);
+		const mw = gfx.getTextWidth(msg, SMALL);
+		gfx.drawText(msg, SMALL, COLORS.dim, (WIDTH - mw) / 2, HEIGHT / 2 - 10);
 	}
 
 	// Header hint
 	const hint = "Back:Feed  Select detail";
-	const hw = render.getTextWidth(hint, TINY);
-	render.drawText(hint, TINY, COLORS.dim, WIDTH - hw - 4, 8);
+	const hw = gfx.getTextWidth(hint, TINY);
+	gfx.drawText(hint, TINY, COLORS.dim, WIDTH - hw - 4, 8);
 
-	render.end();
+	gfx.end();
 }
 
 function renderDetail(item, isCi) {
-	render.begin();
-	render.fillRectangle(COLORS.background, 0, 0, WIDTH, HEIGHT);
+	gfx.begin();
+	gfx.fillRectangle(COLORS.background, 0, 0, WIDTH, HEIGHT);
 
 	// Back indicator
-	render.fillRectangle(rgb(20, 20, 25), 0, 0, WIDTH, 22);
-	render.drawText("< Back", TINY, COLORS.dim, 6, 4);
+	gfx.fillRectangle(rgb(20, 20, 25), 0, 0, WIDTH, 22);
+	gfx.drawText("< Back", TINY, COLORS.dim, 6, 4);
 
 	// Title
 	let title = item.title || item.name || item.workflow || "Detail";
 	if (title.length > 28) title = title.slice(0, 26) + "..";
-	render.drawText(title, SMALL, COLORS.text, 6, 30);
+	gfx.drawText(title, SMALL, COLORS.text, 6, 30);
 
 	let y = 56;
 	const lineH = 16;
@@ -612,37 +614,37 @@ function renderDetail(item, isCi) {
 	if (isCi) {
 		const statusLabel = getCiStatusLabel(item.conclusion, item.status);
 		const statusColor = getCiStatusColor(item.conclusion, item.status);
-		render.drawText(`Status: `, TINY, COLORS.dim, 6, y);
-		const sw = render.getTextWidth(statusLabel, TINY);
-		const slw = render.getTextWidth("Status: ", TINY);
-		render.drawText(statusLabel, TINY, statusColor, 6 + slw, y);
+		gfx.drawText(`Status: `, TINY, COLORS.dim, 6, y);
+		const sw = gfx.getTextWidth(statusLabel, TINY);
+		const slw = gfx.getTextWidth("Status: ", TINY);
+		gfx.drawText(statusLabel, TINY, statusColor, 6 + slw, y);
 	} else {
-		render.drawText(`Type: ${item.type}`, TINY, COLORS.dim, 6, y);
+		gfx.drawText(`Type: ${item.type}`, TINY, COLORS.dim, 6, y);
 	}
 	y += lineH;
 
 	// Repository
-	render.drawText(`Repo: ${item.repository}`, TINY, COLORS.dim, 6, y);
+	gfx.drawText(`Repo: ${item.repository}`, TINY, COLORS.dim, 6, y);
 	y += lineH;
 
 	if (isCi) {
 		// Branch
 		if (item.branch) {
-			render.drawText(`Branch: ${item.branch}`, TINY, COLORS.dim, 6, y);
+			gfx.drawText(`Branch: ${item.branch}`, TINY, COLORS.dim, 6, y);
 			y += lineH;
 		}
 		// Event
 		if (item.event) {
-			render.drawText(`Event: ${item.event}`, TINY, COLORS.dim, 6, y);
+			gfx.drawText(`Event: ${item.event}`, TINY, COLORS.dim, 6, y);
 			y += lineH;
 		}
 		// Run number
-		render.drawText(`Run #${item.runNumber}`, TINY, COLORS.dim, 6, y);
+		gfx.drawText(`Run #${item.runNumber}`, TINY, COLORS.dim, 6, y);
 		y += lineH;
 	} else {
 		// State
 		if (item.state) {
-			render.drawText(`State: ${item.state}`, TINY, COLORS.dim, 6, y);
+			gfx.drawText(`State: ${item.state}`, TINY, COLORS.dim, 6, y);
 			y += lineH;
 		}
 	}
@@ -650,11 +652,11 @@ function renderDetail(item, isCi) {
 	// Updated at
 	if (item.updatedAt) {
 		const date = new Date(item.updatedAt);
-		render.drawText(`Updated: ${date.toLocaleDateString()} ${date.toLocaleTimeString().slice(0, 5)}`, TINY, COLORS.dim, 6, y);
+		gfx.drawText(`Updated: ${date.toLocaleDateString()} ${date.toLocaleTimeString().slice(0, 5)}`, TINY, COLORS.dim, 6, y);
 		y += lineH;
 	}
 
-	render.end();
+	gfx.end();
 }
 
 function render() {
@@ -688,9 +690,9 @@ async function startOAuthOnWatch() {
 		const {device_code, user_code, verification_uri, interval, expires_in} = await startOAuth();
 
 		// Show the code on screen
-		render.begin();
-		render.fillRectangle(COLORS.background, 0, 0, WIDTH, HEIGHT);
-		render.drawText("OAuth Setup", SMALL, COLORS.text, 6, 10);
+		gfx.begin();
+		gfx.fillRectangle(COLORS.background, 0, 0, WIDTH, HEIGHT);
+		gfx.drawText("OAuth Setup", SMALL, COLORS.text, 6, 10);
 
 		const lines = [
 			"1. Open a browser at:",
@@ -700,20 +702,20 @@ async function startOAuthOnWatch() {
 		];
 		let y = 40;
 		for (const l of lines) {
-			const lw = render.getTextWidth(l, TINY);
-			render.drawText(l, TINY, COLORS.dim, (WIDTH - lw) / 2, y);
+			const lw = gfx.getTextWidth(l, TINY);
+			gfx.drawText(l, TINY, COLORS.dim, (WIDTH - lw) / 2, y);
 			y += 18;
 		}
 
 		// Big code
-		const codeW = render.getTextWidth(user_code, LARGE);
-		render.drawText(user_code, LARGE, COLORS.accent, (WIDTH - codeW) / 2, y);
+		const codeW = gfx.getTextWidth(user_code, LARGE);
+		gfx.drawText(user_code, LARGE, COLORS.accent, (WIDTH - codeW) / 2, y);
 		y += 30;
 
-		render.drawText("3. Press SELECT when done", TINY, COLORS.dim, 6, y);
-		render.drawText("or BACK to cancel", TINY, COLORS.dim, 6, y + 16);
+		gfx.drawText("3. Press SELECT when done", TINY, COLORS.dim, 6, y);
+		gfx.drawText("or BACK to cancel", TINY, COLORS.dim, 6, y + 16);
 
-		render.end();
+		gfx.end();
 
 		oauthPhase = 1;
 		state._oauthData = {device_code, interval, expires_in};
