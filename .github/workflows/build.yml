@@ -29,6 +29,9 @@ jobs:
         with:
           node-version: 20
 
+      - name: Install system dependencies
+        run: sudo apt-get update && sudo apt-get install -y libglib2.0-dev
+
       - name: Clone Moddable SDK
         run: |
           git clone --depth 1 https://github.com/Moddable-OpenSource/moddable /tmp/moddable
